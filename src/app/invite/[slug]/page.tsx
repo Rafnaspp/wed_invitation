@@ -33,29 +33,34 @@ export default function InvitationPage() {
 
   function getMockInvitation(slug: string): Invitation {
     return {
-      _id: '1',
-      slug,
-      groom_name: 'Shamil',
-      groom_father: 'Late. Assainar',
-      groom_mother: 'Mrs. Asma',
-      groom_address: 'Al Aman, Kizhunnapara, Thottada',
-      bride_name: 'Sahada',
-      bride_father: 'Mr. Muhammed Ali PK',
-      bride_mother: 'Mrs. Soudath.M',
-      bride_address: "Sahada's, Thannada, Chala",
-      theme: 'islamic',
-      event1_name: 'Nikkah Ceremony',
-      event1_date: '2026-04-26',
-      event1_time: '16:00',
-      event1_location: 'Sheikh Juma Masjid, Thannada',
-      event1_maps_url: 'https://maps.app.goo.gl/fnDRetZGpYwPdr7Z8',
-      event2_name: 'Wedding Reception',
-      event2_date: '2026-04-27',
-      event2_time: '10:00',
-      event2_location: 'Al Aman, Kizhunnapara, Thottada',
-      event2_maps_url: 'https://maps.app.goo.gl/NzfcPADyn87fvxcD6',
-      created_at: new Date().toISOString()
-    }
+  _id: '1',
+  slug,
+  groom_name: 'John Doe',
+  groom_father: 'Mr. Michael Doe',
+  groom_mother: 'Mrs. Sarah Doe',
+  groom_address: '221B Lexington Avenue, Manhattan, New York, NY 10016, USA',
+
+  bride_name: 'Sara Doe',
+  bride_father: 'Mr. Michle Ali',
+  bride_mother: 'Mrs. Sona',
+  bride_address: '45-12 30th Avenue, Astoria, Queens, New York, NY 11103, USA',
+
+  theme: 'islamic',
+
+  event1_name: 'Nikkah Ceremony',
+  event1_date: '2026-04-26',
+  event1_time: '16:00',
+  event1_location: 'Islamic Cultural Center of New York, 1711 3rd Ave, New York, NY 10128, USA',
+  event1_maps_url: 'https://maps.google.com/?q=Islamic+Cultural+Center+of+New+York',
+
+  event2_name: 'Wedding Reception',
+  event2_date: '2026-04-27',
+  event2_time: '10:00',
+  event2_location: 'The Astorian, 28-50 31st St, Astoria, NY 11102, USA',
+  event2_maps_url: 'https://maps.google.com/?q=The+Astorian+NYC',
+
+  created_at: new Date().toISOString()
+}
   }
 
   // Countdown timer

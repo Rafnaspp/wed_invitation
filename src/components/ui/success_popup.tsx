@@ -77,8 +77,8 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-amber-900">Bless us with a cup of tea</h3>
-                  <p className="text-xs text-amber-600">A small token of love for the developer</p>
+                  <h3 className="text-lg font-semibold text-amber-900">Njangalkku oru Chaya kudikkaan ulla cash?</h3>
+                  <p className="text-xs text-amber-600">A small "Dakshina" for the developers who built this.</p>
                 </div>
               </div>
             </div>

@@ -1,20 +1,35 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { api, Invitation } from '@/lib/api'
 
-export default function InvitationPage() {
+export default function InvitationPage({
+  forceOpen = false,
+  data = null,
+}: {
+  forceOpen?: boolean;
+  data?: any | null;
+}) {
+  
   const params = useParams()
+  const searchParams = useSearchParams()
+  const isPreview = searchParams.get('preview') === 'true'
   const router = useRouter()
-  const [invitation, setInvitation] = useState<Invitation | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opened'>('closed')
+  const [invitation, setInvitation] = useState<Invitation | null>(data)
+  const [loading, setLoading] = useState(!data)
+  const shouldSkipEnvelope = forceOpen || isPreview
+const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opened'>(
+  shouldSkipEnvelope ? 'opened' : 'closed'
+)
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' })
   const revealRefs = useRef<(HTMLElement | null)[]>([])
 
   useEffect(() => {
     const fetchInvitation = async () => {
+      if(data){
+        return 
+      }
       try {
         const invitationData = await api.getInvitation(params.slug as string)
         if (invitationData) {
@@ -116,6 +131,8 @@ export default function InvitationPage() {
   }
 
   const handleEnvelopeClick = () => {
+    if (forceOpen) return;
+
     if (envelopeState !== 'closed') return
     setEnvelopeState('opening')
     setTimeout(() => {
@@ -126,6 +143,15 @@ export default function InvitationPage() {
 
   const formatDate = (dateStr: string, opts: Intl.DateTimeFormatOptions) =>
     new Date(dateStr).toLocaleDateString('en-US', opts)
+
+  const formatTime = (timeStr: string) => {
+    if (!timeStr) return ''
+    const [hours, minutes] = timeStr.split(':')
+    const h = parseInt(hours)
+    const ampm = h >= 12 ? 'PM' : 'AM'
+    const h12 = h % 12 || 12
+    return `${h12}:${minutes} ${ampm}`
+  }
 
   if (loading) {
     return (
@@ -270,7 +296,7 @@ export default function InvitationPage() {
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80') center/cover no-repeat;
+          background: url('/Hero.jpg') center/cover no-repeat;
           position: relative;
         }
         .hero-overlay {
@@ -522,7 +548,8 @@ export default function InvitationPage() {
       `}</style>
 
       {/* Envelope Cover */}
-      <div
+      {!shouldSkipEnvelope &&(
+          <div
         className={`envelope-cover${envelopeState === 'opening' ? ' opening' : ''}${envelopeState === 'opened' ? ' opened' : ''}`}
         onClick={handleEnvelopeClick}
       >
@@ -535,9 +562,11 @@ export default function InvitationPage() {
           </div>
         </div>
       </div>
+      )}
+      
 
       {/* Main Content */}
-      <div id="main-content" style={{ display: envelopeState === 'opened' ? 'block' : 'none' }}>
+      <div style={{ display: 'block' }}>
 
         {/* Hero Section */}
         <section className="hero" id="home">
@@ -578,7 +607,7 @@ export default function InvitationPage() {
         </section>
 
         {/* Couple Section */}
-        <section className="section-pad bg-light">
+        <section className="p-2 md:p-4 bg-light">
           <div className="container">
             <div ref={addRevealRef} className="scroll-reveal">
               <div className="couple-grid">
@@ -644,7 +673,7 @@ export default function InvitationPage() {
                     <span className="icon">🕒</span>
                     <div>
                       <p className="strong">Time</p>
-                      <p>{invitation.event1_time}</p>
+                      <p>{formatTime(invitation.event1_time)}</p>
                     </div>
                   </div>
                   <div className="event-row">
@@ -681,7 +710,7 @@ export default function InvitationPage() {
                       <span className="icon">🕒</span>
                       <div>
                         <p className="strong">Time</p>
-                        <p>{invitation.event2_time}</p>
+                        <p>{formatTime(invitation.event2_time)}</p>
                       </div>
                     </div>
                     <div className="event-row">
@@ -728,7 +757,6 @@ export default function InvitationPage() {
             </div>
           </div>
         </footer>
-
       </div>
     </>
   )

@@ -12,6 +12,7 @@ export interface Invitation {
   bride_mother: string
   bride_address: string
   theme: string
+  side:string
   event1_name: string
   event1_date: string
   event1_time: string

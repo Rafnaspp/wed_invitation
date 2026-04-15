@@ -1,20 +1,64 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { api, Invitation } from '@/lib/api'
 
-export default function InvitationPage() {
+export default function InvitationPage({
+  forceOpen = false,
+  data = null,
+}: {
+  forceOpen?: boolean;
+  data?: any | null;
+}) {
+  const themeContent = {
+  islamic: {
+    header: "بسم الله الرحمن الرحيم",
+    subHeader: "In the name of Allah, The most beneficial and the most gracious",
+    inviteText: "With gratitude to Allah, please join us to celebrate the Nikah of",
+    blessing: "Insha Allah",
+    icon: "❧",
+  },
+  hindu: {
+    header: "|| श्री गणेशाय नमः ||",
+    subHeader: "With the divine blessings of God, we cordially invite you",
+    inviteText: "We request the honor of your presence at the wedding ceremony of",
+    blessing: "Mangalam Bhagwan Vishnu",
+    icon: "🪔",
+  },
+  christian: {
+    header: "God has made everything beautiful in its time",
+    subHeader: "Ecclesiastes 3:11",
+    inviteText: "We invite you to witness the joining of two hearts in Holy Matrimony",
+    blessing: "Bound by Love, Blessed by God",
+    icon: "✝",
+  },
+  general: {
+    header: "Together with our Families",
+    subHeader: "We invite you to celebrate our new beginning",
+    inviteText: "Please join us for the wedding celebration of",
+    blessing: "Forever Begins Today",
+    icon: "♥",
+  }
+};
   const params = useParams()
+  const searchParams = useSearchParams()
+  const isPreview = searchParams.get('preview') === 'true'
   const router = useRouter()
-  const [invitation, setInvitation] = useState<Invitation | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opened'>('closed')
+  const [invitation, setInvitation] = useState<Invitation | null>(data)
+  const [loading, setLoading] = useState(!data)
+  const shouldSkipEnvelope = forceOpen || isPreview
+const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opened'>(
+  shouldSkipEnvelope ? 'opened' : 'closed'
+)
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' })
   const revealRefs = useRef<(HTMLElement | null)[]>([])
 
   useEffect(() => {
     const fetchInvitation = async () => {
+      if(data){
+        return 
+      }
       try {
         const invitationData = await api.getInvitation(params.slug as string)
         if (invitationData) {
@@ -30,7 +74,7 @@ export default function InvitationPage() {
     }
     fetchInvitation()
   }, [params.slug])
-
+  
   function getMockInvitation(slug: string): Invitation {
     return {
   _id: '1',
@@ -40,6 +84,7 @@ export default function InvitationPage() {
   groom_mother: 'Mrs. Sarah Doe',
   groom_address: '221B Lexington Avenue, Manhattan, New York, NY 10016, USA',
 
+  side: 'groom',
   bride_name: 'Sara Doe',
   bride_father: 'Mr. Michle Ali',
   bride_mother: 'Mrs. Sona',
@@ -116,6 +161,8 @@ export default function InvitationPage() {
   }
 
   const handleEnvelopeClick = () => {
+    if (forceOpen) return;
+
     if (envelopeState !== 'closed') return
     setEnvelopeState('opening')
     setTimeout(() => {
@@ -126,6 +173,15 @@ export default function InvitationPage() {
 
   const formatDate = (dateStr: string, opts: Intl.DateTimeFormatOptions) =>
     new Date(dateStr).toLocaleDateString('en-US', opts)
+
+  const formatTime = (timeStr: string) => {
+    if (!timeStr) return ''
+    const [hours, minutes] = timeStr.split(':')
+    const h = parseInt(hours)
+    const ampm = h >= 12 ? 'PM' : 'AM'
+    const h12 = h % 12 || 12
+    return `${h12}:${minutes} ${ampm}`
+  }
 
   if (loading) {
     return (
@@ -150,7 +206,7 @@ export default function InvitationPage() {
   const event1DayFormatted = formatDate(invitation.event1_date, { day: 'numeric' })
   const event1YearFormatted = formatDate(invitation.event1_date, { year: 'numeric' })
   const heroDateFormatted = formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' })
-
+  const currentTheme = themeContent[invitation.theme as keyof typeof themeContent] || themeContent.general;
   return (
     <>
       <style>{`
@@ -270,7 +326,7 @@ export default function InvitationPage() {
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80') center/cover no-repeat;
+          background: url('/Hero.jpg') center/cover no-repeat;
           position: relative;
         }
         .hero-overlay {
@@ -522,7 +578,8 @@ export default function InvitationPage() {
       `}</style>
 
       {/* Envelope Cover */}
-      <div
+      {!shouldSkipEnvelope &&(
+          <div
         className={`envelope-cover${envelopeState === 'opening' ? ' opening' : ''}${envelopeState === 'opened' ? ' opened' : ''}`}
         onClick={handleEnvelopeClick}
       >
@@ -535,9 +592,11 @@ export default function InvitationPage() {
           </div>
         </div>
       </div>
+      )}
+      
 
       {/* Main Content */}
-      <div id="main-content" style={{ display: envelopeState === 'opened' ? 'block' : 'none' }}>
+      <div style={{ display: 'block' }}>
 
         {/* Hero Section */}
         <section className="hero" id="home">
@@ -561,36 +620,40 @@ export default function InvitationPage() {
           <div className="container" style={{ textAlign: 'center' }}>
             <div ref={addRevealRef} className="scroll-reveal" style={{ marginBottom: '2rem' }}>
               <div style={{ marginBottom: '2rem' }}>
-                <p className="arabic">بسم الله الرحمن الرحيم</p>
-                <p className="bismillah-eng">In the name of Allah,<br />The most beneficial and the most gracious</p>
+                <p className={invitation.theme === 'islamic'?'arabic':'hero-sub-title'}>{currentTheme.header}</p>
+                <p className="bismillah-eng">{currentTheme.subHeader}</p>
               </div>
               <h2 className="section-title">Invitation</h2>
-              <div className="divider">❧</div>
+              <div className="divider">{currentTheme.icon}</div>
               <h3 className="parents-names">
-                {invitation.groom_father && invitation.groom_mother
-                  ? `${invitation.groom_father} & ${invitation.groom_mother}`
-                  : ''}
+                {invitation.side === 'bride'
+                  ? [invitation.bride_father, invitation.bride_mother].filter(Boolean).join(' & ')
+                  : [invitation.groom_father, invitation.groom_mother].filter(Boolean).join(' & ')}
               </h3>
-              <p className="parents-address">{invitation.groom_address}</p>
-              <p className="invite-msg">With gratitude to Allah, please join us to celebrate the Nikah of</p>
+              <p className="parents-address">
+                {invitation.side === 'bride' ? invitation.bride_address : invitation.groom_address}
+              </p>
+              <p className="invite-msg">{currentTheme.inviteText}</p>
             </div>
           </div>
         </section>
 
         {/* Couple Section */}
-        <section className="section-pad bg-light">
+        <section className="p-2 md:p-4 bg-light">
           <div className="container">
             <div ref={addRevealRef} className="scroll-reveal">
               <div className="couple-grid">
                 <div style={{ textAlign: 'center' }}>
-                  <h2 className="person-name">{invitation.groom_name}</h2>
+                  <h2 className="person-name">{invitation.groom_name}</h2> 
+                  <p className="text-sm text-gray-600">S/O {invitation.groom_father} & {invitation.groom_mother}</p>
                 </div>
                 <div className="ampersand-big">&</div>
                 <div style={{ textAlign: 'center' }}>
-                  <h2 className="person-name">{invitation.bride_name}</h2>
+                  <h2 className="person-name">{invitation.bride_name}</h2> 
+                  <p className="text-sm text-gray-600">D/O {invitation.bride_father} & {invitation.bride_mother}</p>
                 </div>
               </div>
-              <p className="insha-allah">Insha Allah</p>
+              <p className="insha-allah">{currentTheme.blessing}</p>
             </div>
           </div>
         </section>
@@ -644,7 +707,7 @@ export default function InvitationPage() {
                     <span className="icon">🕒</span>
                     <div>
                       <p className="strong">Time</p>
-                      <p>{invitation.event1_time}</p>
+                      <p>{formatTime(invitation.event1_time)}</p>
                     </div>
                   </div>
                   <div className="event-row">
@@ -681,14 +744,14 @@ export default function InvitationPage() {
                       <span className="icon">🕒</span>
                       <div>
                         <p className="strong">Time</p>
-                        <p>{invitation.event2_time}</p>
+                        <p>{formatTime(invitation.event2_time ??'')}</p>
                       </div>
                     </div>
                     <div className="event-row">
                       <span className="icon">📍</span>
                       <div>
                         <p className="strong">Location</p>
-                        <p>{invitation.event2_location}</p>
+                        <p>{invitation.event2_location ??''}</p>
                       </div>
                     </div>
                     {invitation.event2_maps_url && (
@@ -728,7 +791,6 @@ export default function InvitationPage() {
             </div>
           </div>
         </footer>
-
       </div>
     </>
   )

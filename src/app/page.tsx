@@ -1,7 +1,10 @@
+"use client";
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowRight, Heart, Sparkles, Users } from 'lucide-react'
+import {motion} from "framer-motion";
+
 
 export default function HomePage() {
   return (
@@ -31,15 +34,15 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
+      <section className=" py-20">
+        <div className="container mx-auto px-4">
           <div className="flex justify-center mb-6">
             <Sparkles className="w-12 h-12 text-amber-500 animate-pulse" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif text-amber-900 mb-6">
+          <h1 className="text-5xl md:text-7xl font-serif text-amber-900 mb-6 text-center leading-tight">
             Create Your Wedding
             <br />
-            <span className="text-amber-600">Invitation in Minutes</span>
+            <span className="text-amber-600 flex justify-center">Invitation in Minutes</span>
           </h1>
           <p className="text-xl text-amber-700 mb-8 max-w-2xl mx-auto leading-relaxed">
             Design beautiful, personalized wedding invitations that your guests will love. 
@@ -59,24 +62,70 @@ export default function HomePage() {
         </div>
 
         {/* Sample Preview */}
-        <div className="max-w-4xl mx-auto">
-          <Card className="shadow-2xl overflow-hidden">
-            <CardContent className="p-0">
-              <div className="bg-gradient-to-br from-amber-100 to-orange-100 p-8 text-center">
-                <div className="text-2xl font-serif text-amber-900 mb-4">Sample Invitation</div>
-                <div className="text-4xl font-serif text-amber-900 mb-2">John & Jane</div>
-                <div className="text-amber-700 mb-6">Together Forever</div>
-                <div className="bg-white/80 rounded-lg p-4 max-w-sm mx-auto">
-                  <div className="text-amber-800 font-semibold mb-2">Wedding Ceremony</div>
-                  <div className="text-sm text-amber-700">
-                    <div>📅 December 25, 2024</div>
-                    <div>🕐 4:00 PM</div>
-                    <div>📍 Beautiful Garden Venue</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className='flex justify-center items-center mt-10'>
+          <motion.div 
+              initial={{opacity:0 ,y:30 , scale:0.98}}
+              animate={{opacity:1,y:0,scale:1}}
+              transition={{duration:0.8,ease:"easeOut"}}
+              className='w-2xl p-10 rounded-2xl shadow-xl bg-gradient-to-b from[#f5e6d3] to-[#eed9c4]'>
+                  <p className='text-center text-brown-700 text-sm mb-5'>
+                    Sample Invitation
+                  </p>
+                  {/* Names with blur -> clear */}
+                  <motion.h1
+                    initial={{opacity:0,filter:"blur(10px)"}}
+                    animate={{opacity:1,filter:"blur(0px)"}}
+                    transition={{delay:0.2,duration:0.6}}
+                    className='text-center text-3xl font-semibold text-[#6b3e26]'
+                  >
+                    John & Jane
+                  </motion.h1>
+                  {/* Tagline */}
+                  <motion.p
+                    initial={{opacity:0}}
+                    animate={{opacity:1}}
+                    transition={{delay:0.5,duration:0.5}}
+                    className='text-center text-sm text-[#6b3e26] mb-2'>
+                      Together Forever
+                    </motion.p>
+                  {/* Divider */}
+                  <motion.div 
+                    initial={{opacity:0,scale:0.8}}
+                    animate={{opacity:1,scale:1}}
+                    transition={{delay:0.7,duration:0.4}}
+                    className='text-center my-4 text-[#6b3e26]'>
+                      — ❦ —
+                    </motion.div>
+                  {/* Details */}
+                  <motion.div 
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      visible:{
+                        transition:{
+                          staggerChildren:0.15,
+                          delayChildren:0.9,
+                        },
+                      },
+                    }}
+                    className='text-center text-[#6b3e26]'>
+                      {["Decemmber 25,2024","4:00 PM","Beutyful Garden Venue" ].map(
+                        (item,i)=>(
+                          <motion.p
+                            key={i}
+                            variants={{
+                              hidden:{opacity:0,y:10},
+                              visible:{opacity:1,y:0}
+                            }}
+                            transition={{duration:0.4}}
+                            className='my-1'
+                            >
+                              {item}
+                            </motion.p>
+                        )
+                      )}
+                    </motion.div>
+              </motion.div>
         </div>
       </section>
 

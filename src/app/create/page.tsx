@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
+import InvitationPreview from '@/components/ui/invitation_preview';
+import {motion,AnimatePresence} from 'framer-motion';
 
 interface FormData {
   groom_name: string
@@ -19,6 +21,7 @@ interface FormData {
   bride_father: string
   bride_mother: string
   bride_address: string
+  side:string
   theme: string
   event1_name: string
   event1_date: string
@@ -32,12 +35,11 @@ interface FormData {
   event2_maps_url: string
 }
 
+
 export default function CreateInvitation() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [showPopup, setShowPopup] = useState(false)
-  const [invitationLink, setInvitationLink] = useState('')
-  const [copySuccess, setCopySuccess] = useState(false)
+  const [previewPopup,setPreviewPopup] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     groom_name: '',
     groom_father: '',
@@ -47,6 +49,7 @@ export default function CreateInvitation() {
     bride_father: '',
     bride_mother: '',
     bride_address: '',
+    side:'groom',
     theme: 'general',
     event1_name: '',
     event1_date: '',
@@ -82,47 +85,13 @@ export default function CreateInvitation() {
       }
       
       const createdInvitation = await api.createInvitation(invitationData)
-      const link = `${window.location.origin}/invite/${createdInvitation.slug}`
-      setInvitationLink(link)
-      setShowPopup(true)
+      router.push(`/invitation_created?slug=${createdInvitation.slug}`)
     } catch (error) {
       console.error('Error creating invitation:', error)
       alert('Error creating invitation. Please try again.')
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(invitationLink)
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
-    } catch (error) {
-      console.error('Failed to copy link:', error)
-      alert('Failed to copy link. Please try again.')
-    }
-  }
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Wedding Invitation',
-          text: 'You are invited to our wedding!',
-          url: invitationLink
-        })
-      } catch (error) {
-        console.error('Share failed:', error)
-      }
-    } else {
-      handleCopyLink()
-    }
-  }
-
-  const closePopup = () => {
-    setShowPopup(false)
-    setCopySuccess(false)
   }
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -242,6 +211,28 @@ export default function CreateInvitation() {
                 </div>
               </div>
 
+              {/* Side  */}
+              <div className="space-y-4">
+                  <Label>Who is creating this invitation? *</Label>
+                  <div className="flex gap-4">
+                    <Button
+                      type="button"
+                      variant={formData.side === 'groom' ? 'default' : 'outline'}
+                      onClick={() => handleInputChange('side', 'groom')}
+                      className={`flex-1 ${formData.side === 'groom' ? 'bg-amber-600 text-white' : 'bg-white'} hover:bg-amber-600 hover:text-white`}
+                    >
+                      Groom's Side
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={formData.side === 'bride' ? 'default' : 'outline'}
+                      onClick={() => handleInputChange('side', 'bride')}
+                      className={`flex-1 ${formData.side === 'bride' ? 'bg-amber-600 text-white' : 'bg-white'} hover:bg-amber-600 hover:text-white`}
+                    >
+                      Bride's Side
+                    </Button>
+                  </div>
+                </div>
               {/* Event 1 */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-amber-800">Main Event *</h3>
@@ -346,88 +337,51 @@ export default function CreateInvitation() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                disabled={loading}
-              >
-                {loading ? 'Creating...' : 'Create Invitation'}
-              </Button>
+              <div className="flex gap-4">
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                    disabled={loading}
+                  >
+                    {loading ? 'Creating...' : 'Create Invitation'}
+                  </Button>
+                </div>
             </form>
           </CardContent>
         </Card>
       </div>
+      <AnimatePresence>
+  {previewPopup && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    >
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white p-6 rounded-2xl shadow-2xl relative"
+      >
+        {/* Close Button */}
+        <button
+          onClick={() => setPreviewPopup(false)}
+          className="absolute top-3 right-3 text-gray-500 hover:text-black"
+        >
+          ✕
+        </button>
 
-      {/* Success Popup */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">Invitation Created!</h3>
-              <p className="text-gray-600 mb-6">Your wedding invitation has been created successfully.</p>
-              
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <p className="text-sm text-gray-500 mb-2">Invitation Link:</p>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={invitationLink}
-                    readOnly
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCopyLink}
-                  className="flex-1 bg-amber-600 hover:bg-amber-700 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                >
-                  {copySuccess ? (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h2a2 2 0 012 2v2m0 0a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2a2 2 0 012 2v2" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012-2v0a2 2 0 01-2 2H9a2 2 0 01-2-2v0a2 2 0 012 2h6a2 2 0 012-2v0a2 2 0 01-2-2z" />
-                      </svg>
-                      Copy Link
-                    </>
-                  )}
-                </button>
-                
-                <button
-                  onClick={handleShare}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.5c0-.438.114-.868.342-1.342m0 2.816c0 .438.114.868.342 1.342m0-2.816c0-.438-.114-.868-.342-1.342M13.316 13.342c-.438.114-.868.342-1.342m0 2.816c0 .438.114.868.342 1.342" />
-                  </svg>
-                  Share
-                </button>
-              </div>
-
-              <button
-                onClick={closePopup}
-                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-lg font-medium transition-colors mt-4"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+        {/* Preview */}
+        <div className="flex justify-center">
+          <InvitationPreview data={formData as any} forceOpen={true} />
         </div>
-      )}
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
     </div>
   )
 }

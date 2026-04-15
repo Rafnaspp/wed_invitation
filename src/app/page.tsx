@@ -20,11 +20,11 @@ export default function HomePage() {
                   Create Invitation
                 </Button>
               </Link>
-              <Link href="/dashboard">
+              {/* <Link href="/dashboard">
                 <Button variant="ghost" className="text-amber-700">
                   Dashboard
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>

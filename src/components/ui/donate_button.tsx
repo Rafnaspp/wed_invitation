@@ -114,7 +114,7 @@ export default function DonateButton({ onDonate }: DonateButtonProps) {
             ))}
           </motion.div>
 
-          <span className="relative z-10">Donate a cup of tea to the devs?</span>
+          <span className="relative z-10">Devinu oru "Kattanum Parippuvadayum</span>
 
           {/* Arrow nudge */}
           <motion.span

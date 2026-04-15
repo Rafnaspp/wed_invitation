@@ -38,7 +38,7 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
   const finalAmount = customAmount ? parseInt(customAmount) || selectedAmount : selectedAmount
 
   const copyUpi = async () => {
-    await navigator.clipboard.writeText(DONATE_CONFIG.upiId).catch(() => {})
+    await navigator.clipboard.writeText(DONATE_CONFIG.upiId ??'').catch(() => {})
     setUpiCopied(true)
     setTimeout(() => setUpiCopied(false), 2000)
   }
@@ -85,7 +85,7 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
 
             <div className="px-6 py-5 space-y-5">
               {/* QR Code */}
-              <UpiQR upiId={DONATE_CONFIG.upiId} name={DONATE_CONFIG.upiName} amount={finalAmount} />
+              <UpiQR upiId={DONATE_CONFIG.upiId ??''} name={DONATE_CONFIG.upiName??''} amount={finalAmount} />
 
               {/* Amount selector */}
               <div>
@@ -130,7 +130,7 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
 
               {/* Pay button */}
               <a
-                href={`upi://pay?pa=${DONATE_CONFIG.upiId}&pn=${encodeURIComponent(DONATE_CONFIG.upiName)}&am=${finalAmount}&cu=INR`}
+                href={`upi://pay?pa=${DONATE_CONFIG.upiId}&pn=${encodeURIComponent(DONATE_CONFIG.upiName??'')}&am=${finalAmount}&cu=INR`}
                 className="block w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-center py-3.5 rounded-xl font-semibold text-sm shadow-md transition-all"
               >
                 Pay ₹{finalAmount.toLocaleString('en-IN')} via UPI

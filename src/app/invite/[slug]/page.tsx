@@ -744,14 +744,14 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
                       <span className="icon">🕒</span>
                       <div>
                         <p className="strong">Time</p>
-                        <p>{formatTime(invitation.event2_time)}</p>
+                        <p>{formatTime(invitation.event2_time ??'')}</p>
                       </div>
                     </div>
                     <div className="event-row">
                       <span className="icon">📍</span>
                       <div>
                         <p className="strong">Location</p>
-                        <p>{invitation.event2_location}</p>
+                        <p>{invitation.event2_location ??''}</p>
                       </div>
                     </div>
                     {invitation.event2_maps_url && (

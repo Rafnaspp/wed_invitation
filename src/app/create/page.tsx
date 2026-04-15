@@ -21,6 +21,7 @@ interface FormData {
   bride_father: string
   bride_mother: string
   bride_address: string
+  side:string
   theme: string
   event1_name: string
   event1_date: string
@@ -48,6 +49,7 @@ export default function CreateInvitation() {
     bride_father: '',
     bride_mother: '',
     bride_address: '',
+    side:'groom',
     theme: 'general',
     event1_name: '',
     event1_date: '',
@@ -191,7 +193,7 @@ export default function CreateInvitation() {
               </div>
 
               {/* Wedding Theme */}
-              {/* <div className="space-y-4">
+              <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-amber-800">Wedding Theme</h3>
                 <div>
                   <Label htmlFor="theme">Select Theme *</Label>
@@ -207,8 +209,30 @@ export default function CreateInvitation() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div> */}
+              </div>
 
+              {/* Side  */}
+              <div className="space-y-4">
+                  <Label>Who is creating this invitation? *</Label>
+                  <div className="flex gap-4">
+                    <Button
+                      type="button"
+                      variant={formData.side === 'groom' ? 'default' : 'outline'}
+                      onClick={() => handleInputChange('side', 'groom')}
+                      className={`flex-1 ${formData.side === 'groom' ? 'bg-amber-600 text-white' : 'bg-white'} hover:bg-amber-600 hover:text-white`}
+                    >
+                      Groom's Side
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={formData.side === 'bride' ? 'default' : 'outline'}
+                      onClick={() => handleInputChange('side', 'bride')}
+                      className={`flex-1 ${formData.side === 'bride' ? 'bg-amber-600 text-white' : 'bg-white'} hover:bg-amber-600 hover:text-white`}
+                    >
+                      Bride's Side
+                    </Button>
+                  </div>
+                </div>
               {/* Event 1 */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-amber-800">Main Event *</h3>
@@ -314,18 +338,10 @@ export default function CreateInvitation() {
               </div>
 
               <div className="flex gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setPreviewPopup(true)}
-                    className="w-1/2"
-                  >
-                    Preview
-                  </Button>
-
+                  
                   <Button 
                     type="submit" 
-                    className="w-1/2 bg-amber-600 hover:bg-amber-700 text-white"
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                     disabled={loading}
                   >
                     {loading ? 'Creating...' : 'Create Invitation'}

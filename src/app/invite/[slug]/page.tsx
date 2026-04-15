@@ -11,7 +11,36 @@ export default function InvitationPage({
   forceOpen?: boolean;
   data?: any | null;
 }) {
-  
+  const themeContent = {
+  islamic: {
+    header: "بسم الله الرحمن الرحيم",
+    subHeader: "In the name of Allah, The most beneficial and the most gracious",
+    inviteText: "With gratitude to Allah, please join us to celebrate the Nikah of",
+    blessing: "Insha Allah",
+    icon: "❧",
+  },
+  hindu: {
+    header: "|| श्री गणेशाय नमः ||",
+    subHeader: "With the divine blessings of God, we cordially invite you",
+    inviteText: "We request the honor of your presence at the wedding ceremony of",
+    blessing: "Mangalam Bhagwan Vishnu",
+    icon: "🪔",
+  },
+  christian: {
+    header: "God has made everything beautiful in its time",
+    subHeader: "Ecclesiastes 3:11",
+    inviteText: "We invite you to witness the joining of two hearts in Holy Matrimony",
+    blessing: "Bound by Love, Blessed by God",
+    icon: "✝",
+  },
+  general: {
+    header: "Together with our Families",
+    subHeader: "We invite you to celebrate our new beginning",
+    inviteText: "Please join us for the wedding celebration of",
+    blessing: "Forever Begins Today",
+    icon: "♥",
+  }
+};
   const params = useParams()
   const searchParams = useSearchParams()
   const isPreview = searchParams.get('preview') === 'true'
@@ -45,7 +74,7 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
     }
     fetchInvitation()
   }, [params.slug])
-
+  
   function getMockInvitation(slug: string): Invitation {
     return {
   _id: '1',
@@ -55,6 +84,7 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
   groom_mother: 'Mrs. Sarah Doe',
   groom_address: '221B Lexington Avenue, Manhattan, New York, NY 10016, USA',
 
+  side: 'groom',
   bride_name: 'Sara Doe',
   bride_father: 'Mr. Michle Ali',
   bride_mother: 'Mrs. Sona',
@@ -176,7 +206,7 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
   const event1DayFormatted = formatDate(invitation.event1_date, { day: 'numeric' })
   const event1YearFormatted = formatDate(invitation.event1_date, { year: 'numeric' })
   const heroDateFormatted = formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' })
-
+  const currentTheme = themeContent[invitation.theme as keyof typeof themeContent] || themeContent.general;
   return (
     <>
       <style>{`
@@ -590,18 +620,20 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
           <div className="container" style={{ textAlign: 'center' }}>
             <div ref={addRevealRef} className="scroll-reveal" style={{ marginBottom: '2rem' }}>
               <div style={{ marginBottom: '2rem' }}>
-                <p className="arabic">بسم الله الرحمن الرحيم</p>
-                <p className="bismillah-eng">In the name of Allah,<br />The most beneficial and the most gracious</p>
+                <p className={invitation.theme === 'islamic'?'arabic':'hero-sub-title'}>{currentTheme.header}</p>
+                <p className="bismillah-eng">{currentTheme.subHeader}</p>
               </div>
               <h2 className="section-title">Invitation</h2>
-              <div className="divider">❧</div>
+              <div className="divider">{currentTheme.icon}</div>
               <h3 className="parents-names">
-                {invitation.groom_father && invitation.groom_mother
-                  ? `${invitation.groom_father} & ${invitation.groom_mother}`
-                  : ''}
+                {invitation.side === 'bride'
+                  ? [invitation.bride_father, invitation.bride_mother].filter(Boolean).join(' & ')
+                  : [invitation.groom_father, invitation.groom_mother].filter(Boolean).join(' & ')}
               </h3>
-              <p className="parents-address">{invitation.groom_address}</p>
-              <p className="invite-msg">With gratitude to Allah, please join us to celebrate the Nikah of</p>
+              <p className="parents-address">
+                {invitation.side === 'bride' ? invitation.bride_address : invitation.groom_address}
+              </p>
+              <p className="invite-msg">{currentTheme.inviteText}</p>
             </div>
           </div>
         </section>
@@ -612,14 +644,16 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
             <div ref={addRevealRef} className="scroll-reveal">
               <div className="couple-grid">
                 <div style={{ textAlign: 'center' }}>
-                  <h2 className="person-name">{invitation.groom_name}</h2>
+                  <h2 className="person-name">{invitation.groom_name}</h2> 
+                  <p className="text-sm text-gray-600">S/O {invitation.groom_father} & {invitation.groom_mother}</p>
                 </div>
                 <div className="ampersand-big">&</div>
                 <div style={{ textAlign: 'center' }}>
-                  <h2 className="person-name">{invitation.bride_name}</h2>
+                  <h2 className="person-name">{invitation.bride_name}</h2> 
+                  <p className="text-sm text-gray-600">D/O {invitation.bride_father} & {invitation.bride_mother}</p>
                 </div>
               </div>
-              <p className="insha-allah">Insha Allah</p>
+              <p className="insha-allah">{currentTheme.blessing}</p>
             </div>
           </div>
         </section>

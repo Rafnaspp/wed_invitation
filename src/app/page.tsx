@@ -48,7 +48,7 @@ export default function HomePage() {
             Design beautiful, personalized wedding invitations that your guests will love. 
             No design skills required - just fill in your details and we'll create something magical.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col flex-row gap-4 justify-center">
             <Link href="/create">
               <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg">
                 Create Now

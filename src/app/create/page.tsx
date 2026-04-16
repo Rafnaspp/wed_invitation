@@ -23,6 +23,7 @@ interface FormData {
   bride_address: string
   side:string
   theme: string
+  template: string
   event1_name: string
   event1_date: string
   event1_time: string
@@ -51,6 +52,7 @@ export default function CreateInvitation() {
     bride_address: '',
     side:'groom',
     theme: 'general',
+    template: 'classic',
     event1_name: '',
     event1_date: '',
     event1_time: '',
@@ -206,6 +208,24 @@ export default function CreateInvitation() {
                       <SelectItem value="hindu">Hindu</SelectItem>
                       <SelectItem value="christian">Christian</SelectItem>
                       <SelectItem value="general">General</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Template Selection */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-amber-800">Invitation Template</h3>
+                <div>
+                  <Label htmlFor="template">Select Template *</Label>
+                  <Select value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="classic">Classic Minimal</SelectItem>
+                      <SelectItem value="glass">Modern Minimal</SelectItem>
+                      <SelectItem value="ethreal">Ethereal Botanical</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

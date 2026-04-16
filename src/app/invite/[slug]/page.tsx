@@ -3,6 +3,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { api, Invitation } from '@/lib/api'
+import ClassicTemplate from './ClassicTemplate'
+import ModernMinimalistTemplate from './Glass-cardTemplate';
+import EtherealTemplate from './ethrealTemplate'
+
+// Map templates to components. For now, they all fall back to Classic until created.
+const TemplateMap: Record<string, React.FC<any>> = {
+  classic: ClassicTemplate,
+  glass: ModernMinimalistTemplate,
+  ethreal: EtherealTemplate,
+};
 
 export default function InvitationPage({
   forceOpen = false,
@@ -519,19 +529,23 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
           background: linear-gradient(135deg, var(--gold), var(--pink));
           color: #fff;
           text-decoration: none;
-          padding: 14px 28px;
-          border-radius: 30px;
-          font-weight: 500;
-          letter-spacing: 1px;
-          box-shadow: 0 8px 20px rgba(233,30,99,0.2);
-          transition: transform 0.3s, box-shadow 0.3s;
-          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transition: all 0.2s ease;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           cursor: pointer;
           font-family: var(--font-sans);
-          font-size: 1rem;
-          margin-top: 1rem;
+          font-size: 0.9rem;
+          text-transform: uppercase;
         }
-        .gradient-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(233,30,99,0.3); }
+        .gradient-btn:hover { 
+          background: #3a7a5f;
+          transform: translateY(-2px); 
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); 
+        }
 
         /* Footer */
         .footer { background: var(--off-white); }
@@ -577,147 +591,41 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
         }
       `}</style>
 
-      {/* Envelope Cover */}
+      {/* Shared Components like Envelope remain in the main page */}
       {!shouldSkipEnvelope &&(
-          <div
-        className={`envelope-cover${envelopeState === 'opening' ? ' opening' : ''}${envelopeState === 'opened' ? ' opened' : ''}`}
-        onClick={handleEnvelopeClick}
-      >
-        <div className="envelope-inner">
-          <div className="envelope-flap" />
-          <div className="envelope-content">
-            <h1 className="envelope-invite-text">You're Invited</h1>
-            <p className="envelope-tap-text">Tap to open</p>
-            <div className="envelope-seal">♥</div>
+        <div
+          className={`envelope-cover${envelopeState === 'opening' ? ' opening' : ''}${envelopeState === 'opened' ? ' opened' : ''}`}
+          onClick={handleEnvelopeClick}
+        >
+          <div className="envelope-inner">
+            <div className="envelope-flap" />
+            <div className="envelope-content">
+              <h1 className="envelope-invite-text">You're Invited</h1>
+              <p className="envelope-tap-text">Tap to open</p>
+              <div className="envelope-seal">♥</div>
+            </div>
           </div>
         </div>
-      </div>
       )}
-      
 
-      {/* Main Content */}
-      <div style={{ display: 'block' }}>
+      {/* Dynamic Template Rendering */}
+      {(() => {
+        const TemplateComponent = TemplateMap[(invitation as any).template || 'classic'] || ClassicTemplate;
+        return (
+          <TemplateComponent
+            invitation={invitation}
+            timeLeft={timeLeft}
+            currentTheme={currentTheme}
+            addRevealRef={addRevealRef}
+            formatDate={formatDate}
+            formatTime={formatTime}
+          />
+        );
+      })()}
 
-        {/* Hero Section */}
-        <section className="hero" id="home">
-          <div className="hero-overlay" />
-          <div className="hero-glass-card">
-            <p className="hero-sub-title">TOGETHER WITH THEIR FAMILIES</p>
-            <h1 className="hero-names">
-              {invitation.groom_name} <span className="ampersand">&</span> {invitation.bride_name}
-            </h1>
-            <p className="hero-date">{heroDateFormatted}</p>
-          </div>
-          <a href="#intro" className="scroll-down-btn bounce" onClick={(e) => { e.preventDefault(); document.getElementById('intro')?.scrollIntoView({ behavior: 'smooth' }) }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
-          </a>
-        </section>
-
-        {/* Intro / Bismillah Section */}
-        <section className="section-pad" id="intro">
-          <div className="container" style={{ textAlign: 'center' }}>
-            <div ref={addRevealRef} className="scroll-reveal" style={{ marginBottom: '2rem' }}>
-              <div style={{ marginBottom: '2rem' }}>
-                <p className={invitation.theme === 'islamic'?'arabic':'hero-sub-title'}>{currentTheme.header}</p>
-                <p className="bismillah-eng">{currentTheme.subHeader}</p>
-              </div>
-              <h2 className="section-title">Invitation</h2>
-              <div className="divider">{currentTheme.icon}</div>
-              <h3 className="parents-names">
-                {invitation.side === 'bride'
-                  ? [invitation.bride_father, invitation.bride_mother].filter(Boolean).join(' & ')
-                  : [invitation.groom_father, invitation.groom_mother].filter(Boolean).join(' & ')}
-              </h3>
-              <p className="parents-address">
-                {invitation.side === 'bride' ? invitation.bride_address : invitation.groom_address}
-              </p>
-              <p className="invite-msg">{currentTheme.inviteText}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Couple Section */}
-        <section className="p-2 md:p-4 bg-light">
-          <div className="container">
-            <div ref={addRevealRef} className="scroll-reveal">
-              <div className="couple-grid">
-                <div style={{ textAlign: 'center' }}>
-                  <h2 className="person-name">{invitation.groom_name}</h2> 
-                  <p className="text-sm text-gray-600">S/O {invitation.groom_father} & {invitation.groom_mother}</p>
-                </div>
-                <div className="ampersand-big">&</div>
-                <div style={{ textAlign: 'center' }}>
-                  <h2 className="person-name">{invitation.bride_name}</h2> 
-                  <p className="text-sm text-gray-600">D/O {invitation.bride_father} & {invitation.bride_mother}</p>
-                </div>
-              </div>
-              <p className="insha-allah">{currentTheme.blessing}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Countdown Section */}
-        <section className="section-pad" id="countdown">
-          <div className="container" style={{ textAlign: 'center' }}>
-            <div ref={addRevealRef} className="scroll-reveal">
-              <h2 className="section-title">The Big Day</h2>
-              <div className="divider">❧</div>
-              <div className="countdown-grid">
-                <div className="time-box">
-                  <div className="time-val">{timeLeft.days}</div>
-                  <div className="time-label">DAYS</div>
-                </div>
-                <div className="time-box">
-                  <div className="time-val">{timeLeft.hours}</div>
-                  <div className="time-label">HOURS</div>
-                </div>
-                <div className="time-box">
-                  <div className="time-val">{timeLeft.minutes}</div>
-                  <div className="time-label">MINS</div>
-                </div>
-                <div className="time-box">
-                  <div className="time-val">{timeLeft.seconds}</div>
-                  <div className="time-label">SECS</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Events Section */}
-        <section className="section-pad bg-light" id="events">
-          <div className="container">
-            <div ref={addRevealRef} className="scroll-reveal">
-              <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '10px' }}>Event Details</h2>
-              <div className="divider" style={{ textAlign: 'center', marginBottom: '50px' }}>❧</div>
-
-              {/* Event 1 */}
-              <div className="event-card">
-                <div className="event-date-box">
-                  <span className="month">{event1MonthFormatted}</span>
-                  <span className="date">{event1DayFormatted}</span>
-                  <span className="year">{event1YearFormatted}</span>
-                </div>
-                <div className="event-info">
-                  <h3 className="event-title">{invitation.event1_name}</h3>
-                  <p className="event-subtitle">{event1DateFormatted.split(',')[0]}</p>
-                  <div className="event-row">
-                    <span className="icon">🕒</span>
-                    <div>
-                      <p className="strong">Time</p>
-                      <p>{formatTime(invitation.event1_time)}</p>
-                    </div>
-                  </div>
-                  <div className="event-row">
-                    <span className="icon">📍</span>
-                    <div>
-                      <p className="strong">Location</p>
-                      <p>{invitation.event1_location}</p>
-                    </div>
-                  </div>
-                  {invitation.event1_maps_url && (
+      {/* Shared Elements like RSVP/Location buttons can be passed or shared here if not in template */}
+      {envelopeState === 'opened' && invitation.event1_maps_url && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40">
                     <a href={invitation.event1_maps_url} target="_blank" rel="noopener noreferrer" className="gradient-btn">
                       Get Location
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -725,50 +633,8 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
                         <circle cx="12" cy="10" r="3" />
                       </svg>
                     </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Event 2 */}
-              {invitation.event2_name && invitation.event2_date && (
-                <div className="event-card">
-                  <div className="event-date-box">
-                    <span className="month">{formatDate(invitation.event2_date, { month: 'long' }).toUpperCase()}</span>
-                    <span className="date">{formatDate(invitation.event2_date, { day: 'numeric' })}</span>
-                    <span className="year">{formatDate(invitation.event2_date, { year: 'numeric' })}</span>
-                  </div>
-                  <div className="event-info">
-                    <h3 className="event-title">{invitation.event2_name}</h3>
-                    <p className="event-subtitle">{formatDate(invitation.event2_date, { weekday: 'long' })}</p>
-                    <div className="event-row">
-                      <span className="icon">🕒</span>
-                      <div>
-                        <p className="strong">Time</p>
-                        <p>{formatTime(invitation.event2_time ??'')}</p>
-                      </div>
-                    </div>
-                    <div className="event-row">
-                      <span className="icon">📍</span>
-                      <div>
-                        <p className="strong">Location</p>
-                        <p>{invitation.event2_location ??''}</p>
-                      </div>
-                    </div>
-                    {invitation.event2_maps_url && (
-                      <a href={invitation.event2_maps_url} target="_blank" rel="noopener noreferrer" className="gradient-btn">
-                        Get Location
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                          <circle cx="12" cy="10" r="3" />
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
+        </div>
+      )}
 
         {/* Footer */}
         <footer className="footer section-pad" style={{ textAlign: 'center' }}>
@@ -791,7 +657,6 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
             </div>
           </div>
         </footer>
-      </div>
     </>
   )
 }

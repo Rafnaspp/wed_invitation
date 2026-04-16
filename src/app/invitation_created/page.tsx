@@ -177,7 +177,7 @@ function SuccessContent() {
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-800 px-4 py-4 rounded-2xl text-sm font-bold transition-all mb-4 shadow-sm active:shadow-inner"
           >
             <span className="text-2xl animate-bounce">☕</span>
-            Devinu oru "Kattanum Parippuvadayum
+            Oru "Kattanum Parippuvadayum"
           </button>
         </motion.div>
 

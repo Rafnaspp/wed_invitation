@@ -1,7 +1,8 @@
 'use client'
 
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import type { ChangeEvent, MouseEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -20,7 +21,8 @@ export function UpiQR({ upiId, name, amount }: { upiId: string; name: string; am
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="bg-white rounded-xl border border-amber-200 p-3 shadow-sm">
-        <QRCodeSVG value={upiUrl} size={160} level="M" />
+        {/** Render via createElement to avoid JSX component return-type mismatch */}
+        {React.createElement(QRCodeSVG, { value: upiUrl, size: 160, level: 'M' })}
       </div>
       <p className="text-[10px] text-amber-700 text-center leading-relaxed font-medium">
         Scan with Google Pay · PhonePe<br />Paytm · BHIM · any UPI app
@@ -51,7 +53,7 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4"
-          onClick={(e) => e.target === e.currentTarget && onClose()}
+          onClick={(e: MouseEvent<HTMLDivElement>) => e.target === e.currentTarget && onClose()}
         >
           <motion.div
             initial={{ scale: 0.88, opacity: 0, y: 24 }}
@@ -78,7 +80,7 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-amber-900">Njangalkku oru Chaya kudikkaan ulla cash?</h3>
-                  <p className="text-xs text-amber-600">A small "Dakshina" for the developers who built this.</p>
+                  <p className="text-xs text-amber-600">A small &quot;Dakshina&quot; for the developers who built this.</p>
                 </div>
               </div>
             </div>
@@ -109,7 +111,7 @@ export function DonateModal({ open, onClose }: { open: boolean; onClose: () => v
                   type="number"
                   placeholder="Custom amount"
                   value={customAmount}
-                  onChange={e => setCustomAmount(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setCustomAmount(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-amber-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-amber-50 placeholder-amber-300"
                 />
               </div>

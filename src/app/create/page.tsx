@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -41,6 +42,7 @@ export default function CreateInvitation() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [previewPopup,setPreviewPopup] = useState(false)
+  const [step, setStep] = useState<'template' | 'form'>('template')
   const [formData, setFormData] = useState<FormData>({
     groom_name: '',
     groom_father: '',
@@ -65,13 +67,39 @@ export default function CreateInvitation() {
     event2_maps_url: ''
   })
 
+  const templateOptions: Array<{
+    value: FormData['template']
+    label: string
+    description: string
+    imageUrl: string
+  }> = [
+    {
+      value: 'classic',
+      label: 'Classic Minimal',
+      description: 'Elegant serif, timeless and warm',
+      imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070',
+    },
+    {
+      value: 'glass',
+      label: 'Modern Minimal',
+      description: 'Clean typography with glassy hero',
+      imageUrl: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=2070',
+    },
+    {
+      value: 'ethreal',
+      label: 'Ethereal Botanical',
+      description: 'Soft florals, editorial feel',
+      imageUrl: 'https://images.unsplash.com/photo-1596751303335-ca42b3ca50c1?q=80&w=2070',
+    },
+  ]
+
   const generateSlug = (groomName: string, brideName: string) => {
     const groom = groomName.toLowerCase().replace(/\s+/g, '-')
     const bride = brideName.toLowerCase().replace(/\s+/g, '-')
     return `${groom}-${bride}`
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
 
@@ -100,20 +128,107 @@ export default function CreateInvitation() {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleTextChange =
+    (field: keyof FormData) =>
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      handleInputChange(field, e.target.value)
+    }
+
+  const selectedTemplateMeta =
+    templateOptions.find((t) => t.value === formData.template) ?? templateOptions[0]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <Card className="shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-serif text-amber-900">
-              Create Your Wedding Invitation
-            </CardTitle>
-            <CardDescription className="text-amber-700">
-              Fill in the details below to create your beautiful wedding invitation
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-8">
+        {step === 'template' ? (
+          <Card className="shadow-xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-serif text-amber-900">
+                Choose a Wedding Card Design
+              </CardTitle>
+              <CardDescription className="text-amber-700">
+                Select a template first — then we&apos;ll ask for your details
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {templateOptions.map((tpl) => {
+                  const isSelected = formData.template === tpl.value
+                  return (
+                    <button
+                      key={tpl.value}
+                      type="button"
+                      onClick={() => {
+                        handleInputChange('template', tpl.value)
+                        setStep('form')
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                      className={[
+                        'text-left rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-shadow border',
+                        isSelected ? 'border-amber-500 ring-2 ring-amber-200' : 'border-amber-100',
+                      ].join(' ')}
+                    >
+                      <div
+                        className="h-44 w-full bg-center bg-cover"
+                        style={{ backgroundImage: `url(${tpl.imageUrl})` }}
+                      />
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-lg font-semibold text-amber-900">{tpl.label}</p>
+                            <p className="text-sm text-amber-700">{tpl.description}</p>
+                          </div>
+                          <span
+                            className={[
+                              'text-xs px-2 py-1 rounded-full border',
+                              isSelected
+                                ? 'border-amber-300 bg-amber-50 text-amber-800'
+                                : 'border-amber-100 bg-white text-amber-700',
+                            ].join(' ')}
+                          >
+                            {isSelected ? 'Selected' : 'Preview'}
+                          </span>
+                        </div>
+
+                        <div className="mt-4">
+                          <span className="inline-flex items-center justify-center w-full rounded-md bg-amber-600 hover:bg-amber-700 text-white py-2 text-sm font-medium">
+                            Use this design
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="shadow-xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-serif text-amber-900">
+                Create Your Wedding Invitation
+              </CardTitle>
+              <CardDescription className="text-amber-700">
+                Fill in the details below to create your beautiful wedding invitation
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-8 p-4 rounded-xl bg-white border border-amber-100">
+                <div>
+                  <p className="text-sm text-amber-700">Selected design</p>
+                  <p className="text-lg font-semibold text-amber-900">{selectedTemplateMeta.label}</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep('template')}
+                  className="border-amber-200 text-amber-800 hover:bg-amber-50"
+                >
+                  Change template
+                </Button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-8">
               {/* Groom Information */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-amber-800">Groom Information</h3>
@@ -123,7 +238,7 @@ export default function CreateInvitation() {
                     <Input
                       id="groom_name"
                       value={formData.groom_name}
-                      onChange={(e) => handleInputChange('groom_name', e.target.value)}
+                      onChange={handleTextChange('groom_name')}
                       required
                     />
                   </div>
@@ -132,23 +247,23 @@ export default function CreateInvitation() {
                     <Input
                       id="groom_address"
                       value={formData.groom_address}
-                      onChange={(e) => handleInputChange('groom_address', e.target.value)}
+                      onChange={handleTextChange('groom_address')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="groom_father">Father's Name</Label>
+                    <Label htmlFor="groom_father">Father&apos;s Name</Label>
                     <Input
                       id="groom_father"
                       value={formData.groom_father}
-                      onChange={(e) => handleInputChange('groom_father', e.target.value)}
+                      onChange={handleTextChange('groom_father')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="groom_mother">Mother's Name</Label>
+                    <Label htmlFor="groom_mother">Mother&apos;s Name</Label>
                     <Input
                       id="groom_mother"
                       value={formData.groom_mother}
-                      onChange={(e) => handleInputChange('groom_mother', e.target.value)}
+                      onChange={handleTextChange('groom_mother')}
                     />
                   </div>
                 </div>
@@ -163,7 +278,7 @@ export default function CreateInvitation() {
                     <Input
                       id="bride_name"
                       value={formData.bride_name}
-                      onChange={(e) => handleInputChange('bride_name', e.target.value)}
+                      onChange={handleTextChange('bride_name')}
                       required
                     />
                   </div>
@@ -172,23 +287,23 @@ export default function CreateInvitation() {
                     <Input
                       id="bride_address"
                       value={formData.bride_address}
-                      onChange={(e) => handleInputChange('bride_address', e.target.value)}
+                      onChange={handleTextChange('bride_address')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="bride_father">Father's Name</Label>
+                    <Label htmlFor="bride_father">Father&apos;s Name</Label>
                     <Input
                       id="bride_father"
                       value={formData.bride_father}
-                      onChange={(e) => handleInputChange('bride_father', e.target.value)}
+                      onChange={handleTextChange('bride_father')}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="bride_mother">Mother's Name</Label>
+                    <Label htmlFor="bride_mother">Mother&apos;s Name</Label>
                     <Input
                       id="bride_mother"
                       value={formData.bride_mother}
-                      onChange={(e) => handleInputChange('bride_mother', e.target.value)}
+                      onChange={handleTextChange('bride_mother')}
                     />
                   </div>
                 </div>
@@ -199,7 +314,7 @@ export default function CreateInvitation() {
                 <h3 className="text-xl font-semibold text-amber-800">Wedding Theme</h3>
                 <div>
                   <Label htmlFor="theme">Select Theme *</Label>
-                  <Select value={formData.theme} onValueChange={(value) => handleInputChange('theme', value)}>
+                  <Select value={formData.theme} onValueChange={(value: string) => handleInputChange('theme', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a theme" />
                     </SelectTrigger>
@@ -208,24 +323,6 @@ export default function CreateInvitation() {
                       <SelectItem value="hindu">Hindu</SelectItem>
                       <SelectItem value="christian">Christian</SelectItem>
                       <SelectItem value="general">General</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Template Selection */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-amber-800">Invitation Template</h3>
-                <div>
-                  <Label htmlFor="template">Select Template *</Label>
-                  <Select value={formData.template} onValueChange={(value) => handleInputChange('template', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="classic">Classic Minimal</SelectItem>
-                      <SelectItem value="glass">Modern Minimal</SelectItem>
-                      <SelectItem value="ethreal">Ethereal Botanical</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -241,7 +338,7 @@ export default function CreateInvitation() {
                       onClick={() => handleInputChange('side', 'groom')}
                       className={`flex-1 ${formData.side === 'groom' ? 'bg-amber-600 text-white' : 'bg-white'} hover:bg-amber-600 hover:text-white`}
                     >
-                      Groom's Side
+                      Groom&apos;s Side
                     </Button>
                     <Button
                       type="button"
@@ -249,7 +346,7 @@ export default function CreateInvitation() {
                       onClick={() => handleInputChange('side', 'bride')}
                       className={`flex-1 ${formData.side === 'bride' ? 'bg-amber-600 text-white' : 'bg-white'} hover:bg-amber-600 hover:text-white`}
                     >
-                      Bride's Side
+                      Bride&apos;s Side
                     </Button>
                   </div>
                 </div>
@@ -262,7 +359,7 @@ export default function CreateInvitation() {
                     <Input
                       id="event1_name"
                       value={formData.event1_name}
-                      onChange={(e) => handleInputChange('event1_name', e.target.value)}
+                      onChange={handleTextChange('event1_name')}
                       required
                     />
                   </div>
@@ -272,7 +369,7 @@ export default function CreateInvitation() {
                       id="event1_date"
                       type="date"
                       value={formData.event1_date}
-                      onChange={(e) => handleInputChange('event1_date', e.target.value)}
+                      onChange={handleTextChange('event1_date')}
                       required
                     />
                   </div>
@@ -282,7 +379,7 @@ export default function CreateInvitation() {
                       id="event1_time"
                       type="time"
                       value={formData.event1_time}
-                      onChange={(e) => handleInputChange('event1_time', e.target.value)}
+                      onChange={handleTextChange('event1_time')}
                       required
                     />
                   </div>
@@ -291,7 +388,7 @@ export default function CreateInvitation() {
                     <Input
                       id="event1_maps_url"
                       value={formData.event1_maps_url}
-                      onChange={(e) => handleInputChange('event1_maps_url', e.target.value)}
+                      onChange={handleTextChange('event1_maps_url')}
                       placeholder="https://maps.google.com/..."
                     />
                   </div>
@@ -300,7 +397,7 @@ export default function CreateInvitation() {
                     <Textarea
                       id="event1_location"
                       value={formData.event1_location}
-                      onChange={(e) => handleInputChange('event1_location', e.target.value)}
+                      onChange={handleTextChange('event1_location')}
                       required
                     />
                   </div>
@@ -316,7 +413,7 @@ export default function CreateInvitation() {
                     <Input
                       id="event2_name"
                       value={formData.event2_name}
-                      onChange={(e) => handleInputChange('event2_name', e.target.value)}
+                      onChange={handleTextChange('event2_name')}
                     />
                   </div>
                   <div>
@@ -325,7 +422,7 @@ export default function CreateInvitation() {
                       id="event2_date"
                       type="date"
                       value={formData.event2_date}
-                      onChange={(e) => handleInputChange('event2_date', e.target.value)}
+                      onChange={handleTextChange('event2_date')}
                     />
                   </div>
                   <div>
@@ -334,7 +431,7 @@ export default function CreateInvitation() {
                       id="event2_time"
                       type="time"
                       value={formData.event2_time}
-                      onChange={(e) => handleInputChange('event2_time', e.target.value)}
+                      onChange={handleTextChange('event2_time')}
                     />
                   </div>
                   <div>
@@ -342,7 +439,7 @@ export default function CreateInvitation() {
                     <Input
                       id="event2_maps_url"
                       value={formData.event2_maps_url}
-                      onChange={(e) => handleInputChange('event2_maps_url', e.target.value)}
+                      onChange={handleTextChange('event2_maps_url')}
                       placeholder="https://maps.google.com/..."
                     />
                   </div>
@@ -351,7 +448,7 @@ export default function CreateInvitation() {
                     <Textarea
                       id="event2_location"
                       value={formData.event2_location}
-                      onChange={(e) => handleInputChange('event2_location', e.target.value)}
+                      onChange={handleTextChange('event2_location')}
                     />
                   </div>
                 </div>
@@ -369,7 +466,8 @@ export default function CreateInvitation() {
                 </div>
             </form>
           </CardContent>
-        </Card>
+          </Card>
+        )}
       </div>
       <AnimatePresence>
   {previewPopup && (
@@ -396,7 +494,7 @@ export default function CreateInvitation() {
 
         {/* Preview */}
         <div className="flex justify-center">
-          <InvitationPreview data={formData as any} forceOpen={true} />
+          <InvitationPreview data={formData} />
         </div>
       </motion.div>
     </motion.div>

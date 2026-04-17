@@ -1,17 +1,25 @@
 'use client'
 
-import React from 'react'
-import { Invitation } from '@/lib/api'
 import { TemplateProps } from './ClassicTemplate'
 
-const EtherealTemplate: React.FC<TemplateProps> = ({
+/* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/no-explicit-any */
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any
+    }
+  }
+}
+/* eslint-enable @typescript-eslint/no-namespace, @typescript-eslint/no-explicit-any */
+
+function EtherealTemplate({
   invitation,
   timeLeft,
   currentTheme,
   addRevealRef,
   formatDate,
   formatTime
-}) => {
+}: TemplateProps) {
   const heroDate = formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' })
   const eventDay = formatDate(invitation.event1_date, { day: '2-digit' })
   const eventMonth = formatDate(invitation.event1_date, { month: 'short' }).toUpperCase()
@@ -36,17 +44,21 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
         .eth-hero {
           display: grid;
           grid-template-columns: 1fr;
-          min-height: 100vh;
+          min-height: auto;
         }
         @media (min-width: 768px) {
-          .eth-hero { grid-template-columns: 55% 45%; }
+          .eth-hero { min-height: 100vh; }
         }
 
         .eth-hero-img {
           position: relative;
-          height: 52vw;
-          min-height: 320px;
+          height: 72vh;
+          min-height: 520px;
+          max-height: 860px;
           overflow: hidden;
+        }
+        @media (max-width: 420px) {
+          .eth-hero-img { min-height: 580px; }
         }
         @media (min-width: 768px) {
           .eth-hero-img { height: 100vh; min-height: unset; }
@@ -58,34 +70,61 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
           object-position: center;
           display: block;
         }
+        .eth-hero-img::after{
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 50% 35%, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.46) 40%, rgba(255,255,255,0.10) 70%, rgba(255,255,255,0.00) 100%),
+                      linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.00) 55%, rgba(0,0,0,0.10) 100%);
+          pointer-events: none;
+        }
+
+        .eth-hero-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem 1.25rem;
+          text-align: center;
+          z-index: 1;
+        }
+        @media (min-width: 768px) {
+          .eth-hero-overlay { padding: 3rem; }
+        }
+        .eth-hero-overlay-inner{
+          width: min(560px, 100%);
+        }
 
         .eth-hero-content {
-          display: flex;
+          display: none;
           flex-direction: column;
           justify-content: center;
           padding: 3rem 2.5rem;
           background: #FBFBF9;
         }
-        @media (min-width: 768px) {
-          .eth-hero-content {
-            padding: 4rem 3.5rem;
-            border-left: 1px solid #EBEBEA;
-          }
-        }
+        /* Keep hero image full-width on desktop too (no empty right side) */
+        @media (min-width: 768px) { .eth-hero-content { display: none; } }
 
         .eth-hero-names {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 400;
-          font-size: clamp(2.8rem, 6vw, 4.5rem);
-          line-height: 1.15;
+          font-size: clamp(2.1rem, 7.5vw, 4.1rem);
+          line-height: 1.08;
           color: #3A3A3A;
-          margin: 1.8rem 0 0;
+          margin: 1.1rem 0 0;
+          text-align: center;
+          overflow-wrap: anywhere;
+          word-break: break-word;
         }
-        .eth-hero-names em {
+        .eth-hero-name { display: block; }
+        .eth-hero-and {
+          display: block;
           font-weight: 300;
           font-style: italic;
-          display: block;
-          padding-left: 1.8rem;
+          font-size: 0.72em;
+          line-height: 1;
+          margin: 0.35rem 0;
           color: #5A5A5A;
         }
 
@@ -93,7 +132,8 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
           display: flex;
           align-items: center;
           gap: 1rem;
-          margin-top: 2rem;
+          margin-top: 1.2rem;
+          justify-content: center;
         }
         .eth-date-bar-line {
           width: 2px;
@@ -311,29 +351,31 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
       <section className="eth-hero" id="home">
         <div className="eth-hero-img">
           <img src={heroImageUrl} alt="Soft wedding floral setting" />
-        </div>
-        <div className="eth-hero-content">
-          <div ref={addRevealRef} className="scroll-reveal">
-            <span className="eth-label" style={{ color: '#BF9B30', display: 'block' }}>
-              Beginning our forever
-            </span>
-            <h1 className="eth-hero-names">
-              {invitation.groom_name}
-              <em>& {invitation.bride_name}</em>
-            </h1>
-            <div className="eth-date-bar">
-              <div className="eth-date-bar-line" />
-              <div>
-                <span className="eth-label" style={{ color: '#8A8A85', display: 'block' }}>
-                  {formatDate(invitation.event1_date, { weekday: 'long' })}
-                </span>
-                <span className="eth-label" style={{ fontSize: 11, marginTop: 4, color: '#5A5A5A', display: 'block', letterSpacing: '0.12em' }}>
-                  {heroDate}
-                </span>
+          <div className="eth-hero-overlay">
+            <div className="eth-hero-overlay-inner" ref={addRevealRef}>
+              <span className="eth-label" style={{ color: '#BF9B30', display: 'block' }}>
+                Beginning our forever
+              </span>
+              <h1 className="eth-hero-names">
+                <span className="eth-hero-name">{invitation.groom_name}</span>
+                <span className="eth-hero-and">&</span>
+                <span className="eth-hero-name">{invitation.bride_name}</span>
+              </h1>
+              <div className="eth-date-bar">
+                <div className="eth-date-bar-line" />
+                <div>
+                  <span className="eth-label" style={{ color: '#8A8A85', display: 'block' }}>
+                    {formatDate(invitation.event1_date, { weekday: 'long' })}
+                  </span>
+                  <span className="eth-label" style={{ fontSize: 11, marginTop: 4, color: '#5A5A5A', display: 'block', letterSpacing: '0.12em' }}>
+                    {heroDate}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <div className="eth-hero-content" aria-hidden="true" />
       </section>
 
       {/* INTRO */}
@@ -349,13 +391,17 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
             {currentTheme.header}
           </p>
           <div className="eth-divider" style={{ marginBottom: '2rem' }} />
-          <p className="eth-intro-quote">"{currentTheme.inviteText}"</p>
+          <p className="eth-intro-quote">
+            <span aria-hidden="true">“</span>
+            {currentTheme.inviteText}
+            <span aria-hidden="true">”</span>
+          </p>
           <p className="eth-label" style={{ color: '#8A8A85', marginBottom: '1rem' }}>
             The wedding of
           </p>
           <p className="eth-intro-names">
             {invitation.groom_name}
-            <span>and</span>
+            <span style={{ display: 'block', margin: '0.4rem 0', textAlign: 'center' }}>&</span>
             {invitation.bride_name}
           </p>
 
@@ -414,13 +460,13 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
         <p className="eth-label" style={{ color: '#BF9B30' }}>Counting down to forever</p>
         <div className="eth-countdown-grid">
           {Object.entries(timeLeft).map(([unit, value], i, arr) => (
-            <React.Fragment key={unit}>
+            <div key={unit} className="contents">
               <div className="eth-countdown-unit">
                 <div className="eth-countdown-val">{value}</div>
                 <p className="eth-label" style={{ color: '#8A8A85', marginTop: '0.7rem' }}>{unit}</p>
               </div>
               {i < arr.length - 1 && <div className="eth-countdown-sep" />}
-            </React.Fragment>
+            </div>
           ))}
         </div>
       </section>
@@ -428,7 +474,11 @@ const EtherealTemplate: React.FC<TemplateProps> = ({
       {/* FOOTER */}
       <footer className="eth-footer">
         <div className="eth-divider" style={{ marginBottom: '2rem' }} />
-        <p className="eth-blessing">"{currentTheme.blessing}"</p>
+        <p className="eth-blessing">
+          <span aria-hidden="true">“</span>
+          {currentTheme.blessing}
+          <span aria-hidden="true">”</span>
+        </p>
         <div className="eth-divider" style={{ marginTop: '2rem' }} />
       </footer>
     </div>

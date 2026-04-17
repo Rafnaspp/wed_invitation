@@ -1,4 +1,5 @@
 "use client";
+import React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -18,11 +19,13 @@ export default function HomePage() {
               <span className="text-xl font-serif text-amber-900">WeddingInvites</span>
             </div>
             <div className="flex gap-4">
-              <Link href="/create">
+              {React.createElement(
+                Link,
+                { href: '/create' },
                 <Button variant="outline" className="border-amber-600 text-amber-600 hover:bg-amber-50">
                   Create Invitation
                 </Button>
-              </Link>
+              )}
               {/* <Link href="/dashboard">
                 <Button variant="ghost" className="text-amber-700">
                   Dashboard
@@ -45,16 +48,18 @@ export default function HomePage() {
             <span className="text-amber-600 flex justify-center">Invitation in Minutes</span>
           </h1>
           <p className="text-xl text-amber-700 mb-8 max-w-2xl mx-auto leading-relaxed">
-            Design beautiful, personalized wedding invitations that your guests will love. 
-            No design skills required - just fill in your details and we'll create something magical.
+          {"Design beautiful, personalized wedding invitations that your guests will love. "}
+            {"No design skills required - just fill in your details and we'll create something magical."}
           </p>
           <div className="flex flex-col flex-row gap-4 justify-center">
-            <Link href="/create">
+            {React.createElement(
+              Link,
+              { href: '/create' },
               <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg">
                 Create Now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-            </Link>
+            )}
             {/* <Button size="lg" variant="outline" className="border-amber-600 text-amber-600 hover:bg-amber-50 px-8 py-4 text-lg">
               View Sample
             </Button> */}
@@ -184,12 +189,14 @@ export default function HomePage() {
           <p className="text-xl text-amber-700 mb-8 max-w-2xl mx-auto">
             Join thousands of couples who have created beautiful wedding invitations with our platform
           </p>
-          <Link href="/create">
+          {React.createElement(
+            Link,
+            { href: '/create' },
             <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg">
               Get Started Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-          </Link>
+          )}
         </div>
       </section>
 

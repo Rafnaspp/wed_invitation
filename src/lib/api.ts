@@ -3,6 +3,7 @@
 export interface Invitation {
   _id?: string
   slug: string
+  template?: string
   groom_name: string
   groom_father: string
   groom_mother: string

@@ -2,13 +2,14 @@
 
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import type { MouseEvent } from "react";
 
 interface DonateButtonProps {
   onDonate?: () => void;  // ← add this
 }
 
 export default function DonateButton({ onDonate }: DonateButtonProps) {
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; dist: number }[]>([]);
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const controls = useAnimation();
 
@@ -20,7 +21,7 @@ export default function DonateButton({ onDonate }: DonateButtonProps) {
     });
   }, [controls]);
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     onDonate?.();  
 
     // Ripple effect
@@ -36,6 +37,7 @@ export default function DonateButton({ onDonate }: DonateButtonProps) {
       id: Date.now() + i,
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
+      dist: 55 + Math.random() * 30,
     }));
     setParticles(newParticles);
     setTimeout(() => setParticles([]), 900);
@@ -114,7 +116,7 @@ export default function DonateButton({ onDonate }: DonateButtonProps) {
             ))}
           </motion.div>
 
-          <span className="relative z-10">Devinu oru "Kattanum Parippuvadayum</span>
+          <span className="relative z-10">{' oru "Kattanum Parippuvadayum'}</span>
 
           {/* Arrow nudge */}
           <motion.span
@@ -131,7 +133,6 @@ export default function DonateButton({ onDonate }: DonateButtonProps) {
           {particles.map((p, i) => {
             const angle = (i / particles.length) * 360;
             const rad = (angle * Math.PI) / 180;
-            const dist = 55 + Math.random() * 30;
             return (
               <motion.div
                 key={p.id + i}
@@ -139,8 +140,8 @@ export default function DonateButton({ onDonate }: DonateButtonProps) {
                 style={{ left: p.x, top: p.y }}
                 initial={{ scale: 1, opacity: 1, x: 0, y: 0 }}
                 animate={{
-                  x: Math.cos(rad) * dist,
-                  y: Math.sin(rad) * dist,
+                  x: Math.cos(rad) * p.dist,
+                  y: Math.sin(rad) * p.dist,
                   scale: 0,
                   opacity: 0,
                 }}

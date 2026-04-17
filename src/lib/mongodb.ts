@@ -1,17 +1,18 @@
 import { MongoClient } from 'mongodb'
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your MongoDB URI to .env.local')
-}
-
 const uri = process.env.MONGODB_URI
 const options = {}
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>
 
-if (process.env.NODE_ENV === 'development') {
-  let globalWithMongo = global as typeof global & {
+if (!uri) {
+  // Don't crash module evaluation; let API handlers catch this on await.
+  clientPromise = Promise.reject(
+    new Error('Missing MONGODB_URI. Add it to your .env.local file.'),
+  )
+} else if (process.env.NODE_ENV === 'development') {
+  const globalWithMongo = global as typeof global & {
     _mongoClientPromise?: Promise<MongoClient>
   }
 

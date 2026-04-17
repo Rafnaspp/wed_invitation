@@ -1,25 +1,29 @@
 'use client'
 
+import type { ComponentType } from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { api, Invitation } from '@/lib/api'
 import ClassicTemplate from './ClassicTemplate'
-import ModernMinimalistTemplate from './Glass-cardTemplate';
+import type { TemplateProps } from './ClassicTemplate'
+import ModernMinimalistTemplate from './Glass-cardTemplate'
 import EtherealTemplate from './ethrealTemplate'
+import GoldMandalaTemplate from './GoldMandalaTemplate'
 
 // Map templates to components. For now, they all fall back to Classic until created.
-const TemplateMap: Record<string, React.FC<any>> = {
+const TemplateMap: Record<string, ComponentType<TemplateProps>> = {
   classic: ClassicTemplate,
   glass: ModernMinimalistTemplate,
   ethreal: EtherealTemplate,
-};
+  gold: GoldMandalaTemplate,
+}
 
 export default function InvitationPage({
   forceOpen = false,
   data = null,
 }: {
-  forceOpen?: boolean;
-  data?: any | null;
+  forceOpen?: boolean
+  data?: Invitation | null
 }) {
   const themeContent = {
   islamic: {
@@ -57,7 +61,7 @@ export default function InvitationPage({
   const router = useRouter()
   const [invitation, setInvitation] = useState<Invitation | null>(data)
   const [loading, setLoading] = useState(!data)
-  const shouldSkipEnvelope = forceOpen || isPreview
+  const shouldSkipEnvelope = forceOpen || isPreview || invitation?.template === 'gold'
 const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opened'>(
   shouldSkipEnvelope ? 'opened' : 'closed'
 )
@@ -211,11 +215,6 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
     )
   }
 
-  const event1DateFormatted = formatDate(invitation.event1_date, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-  const event1MonthFormatted = formatDate(invitation.event1_date, { month: 'long' }).toUpperCase()
-  const event1DayFormatted = formatDate(invitation.event1_date, { day: 'numeric' })
-  const event1YearFormatted = formatDate(invitation.event1_date, { year: 'numeric' })
-  const heroDateFormatted = formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' })
   const currentTheme = themeContent[invitation.theme as keyof typeof themeContent] || themeContent.general;
   return (
     <>
@@ -600,7 +599,7 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
           <div className="envelope-inner">
             <div className="envelope-flap" />
             <div className="envelope-content">
-              <h1 className="envelope-invite-text">You're Invited</h1>
+              <h1 className="envelope-invite-text">You&apos;re Invited</h1>
               <p className="envelope-tap-text">Tap to open</p>
               <div className="envelope-seal">♥</div>
             </div>
@@ -610,7 +609,8 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
 
       {/* Dynamic Template Rendering */}
       {(() => {
-        const TemplateComponent = TemplateMap[(invitation as any).template || 'classic'] || ClassicTemplate;
+        const TemplateComponent =
+          TemplateMap[invitation.template || 'classic'] ?? ClassicTemplate
         return (
           <TemplateComponent
             invitation={invitation}
@@ -653,7 +653,7 @@ const [envelopeState, setEnvelopeState] = useState<'closed' | 'opening' | 'opene
                 <p className="comp-text">With Best Compliments From</p>
                 <p className="comp-names">Family and Friends</p>
               </div>
-              <p className="footer-credit">We can't wait to celebrate with you!</p>
+              <p className="footer-credit">We can&apos;t wait to celebrate with you!</p>
             </div>
           </div>
         </footer>

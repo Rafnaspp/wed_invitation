@@ -346,7 +346,7 @@ const ModernMinimalistTemplate: React.FC<TemplateProps> = ({
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="mm-serif mm-blessing">"{currentTheme.blessing}"</p>
+              <p className="mm-serif mm-blessing">{"{" + currentTheme.blessing + "}"}</p>
             </div>
           </div>
         </div>

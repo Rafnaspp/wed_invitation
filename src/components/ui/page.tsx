@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { DonateModal } from '@/components/ui/success_popup'
@@ -10,14 +10,13 @@ function SuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const slug = searchParams.get('slug')
-  const [invitationLink, setInvitationLink] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
   const [showDonate, setShowDonate] = useState(false)
+  const invitationLink =
+    slug && typeof window !== 'undefined' ? `${window.location.origin}/invite/${slug}` : ''
 
   useEffect(() => {
-    if (slug) {
-      setInvitationLink(`${window.location.origin}/invite/${slug}`)
-    } else {
+    if (!slug) {
       // If someone lands here without a slug, send them back to create
       router.push('/create')
     }
@@ -123,19 +122,24 @@ function SuccessContent() {
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-800 px-4 py-3 rounded-xl text-sm font-medium transition-all mb-3 active:scale-95"
           >
             <span className="text-xl">☕</span>
-            Devinu oru "Kattanum Parippuvadayum
+            {' oru "Kattanum Parippuvadayum'}
           </button>
 
           <div className="flex flex-col gap-2">
-            <Link
-              href="/create"
-              className="w-full bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 px-4 py-3 rounded-xl text-sm font-medium transition-all"
-            >
-              Iniyum Onnu Undakkiyaalo?
-            </Link>
-            <Link href="/" className="text-xs text-amber-600 hover:underline">
-              Back to Home
-            </Link>
+            {React.createElement(
+              Link,
+              {
+                href: '/create',
+                className:
+                  'w-full bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 px-4 py-3 rounded-xl text-sm font-medium transition-all',
+              },
+              'Iniyum Onnu Undakkiyaalo?'
+            )}
+            {React.createElement(
+              Link,
+              { href: '/', className: 'text-xs text-amber-600 hover:underline' },
+              'Back to Home'
+            )}
           </div>
         </div>
       </motion.div>
@@ -147,9 +151,9 @@ function SuccessContent() {
 }
 
 export default function SuccessPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SuccessContent />
-    </Suspense>
+  return React.createElement(
+    Suspense,
+    { fallback: React.createElement('div', null, 'Loading...') },
+    React.createElement(SuccessContent)
   )
 }

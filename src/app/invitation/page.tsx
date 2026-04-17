@@ -117,7 +117,7 @@ export default function WeddingInvitation() {
         <div className="envelope-inner">
           <div className="envelope-flap"></div>
           <div className="envelope-content">
-            <h1 className="invite-text">You're Invited</h1>
+            <h1 className="invite-text">{"You're Invited"}</h1>
             <p className="tap-text">Tap to open</p>
             <div className="envelope-seal">♥</div>
           </div>
@@ -275,7 +275,7 @@ export default function WeddingInvitation() {
               <p className="comp-text text-teal">With Best Compliments From</p>
               <p className="comp-names text-gold uppercase">Family and Friends</p>
             </div>
-            <p className="footer-credit mt-4">We can't wait to celebrate with you!</p>
+            <p className="footer-credit mt-4">{"We can't wait to celebrate with you!"}</p>
           </div>
         </footer>
       </div>

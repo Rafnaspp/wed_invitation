@@ -1,20 +1,22 @@
 'use client'
 
+import React from 'react'
 import { useState, useEffect, Suspense } from 'react'
+import type { MouseEvent } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { AnimatePresence, motion,useAnimation } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { DonateModal } from '@/components/ui/success_popup'
 import Link from 'next/link'
-import DonateButton from '@/components/ui/donate_button';
 
 function SuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const slug = searchParams.get('slug')
-  const [invitationLink, setInvitationLink] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
   const [showDonate, setShowDonate] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
+  const invitationLink =
+    slug && typeof window !== 'undefined' ? `${window.location.origin}/invite/${slug}` : ''
   
   const handleDonate = () => {
     setShowDonate(true);
@@ -23,9 +25,7 @@ function SuccessContent() {
   };
 
   useEffect(() => {
-    if (slug) {
-      setInvitationLink(`${window.location.origin}/invite/${slug}`)
-    } else {
+    if (!slug) {
       // If someone lands here without a slug, send them back to create
       router.push('/create')
     }
@@ -110,7 +110,7 @@ function SuccessContent() {
                         exit={{ scale: 0.95, opacity: 0 }}
                         transition={{ type: 'spring', damping: 20 }}
                         className="relative w-full max-w-sm h-[75vh] bg-white rounded-2xl overflow-hidden shadow-2xl"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
                     >
                         {/* Modal header */}
                         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white z-10">
@@ -177,7 +177,7 @@ function SuccessContent() {
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-800 px-4 py-4 rounded-2xl text-sm font-bold transition-all mb-4 shadow-sm active:shadow-inner"
           >
             <span className="text-2xl animate-bounce">☕</span>
-            Oru "Kattanum Parippuvadayum"
+            {'Oru "Kattanum Parippuvadayum"'}
           </button>
         </motion.div>
 
@@ -197,15 +197,20 @@ function SuccessContent() {
       </AnimatePresence>
 
           <div className="flex flex-col gap-2">
-            <Link
-              href="/create"
-              className="mt-4 w-full bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 px-4 py-3 rounded-xl text-sm font-medium transition-all"
-            >
-              Create one more invitation?
-            </Link>
-            <Link href="/" className="text-xs text-amber-600 hover:underline">
-              Back to Home
-            </Link>
+            {React.createElement(
+              Link,
+              {
+                href: '/create',
+                className:
+                  'mt-4 w-full bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 px-4 py-3 rounded-xl text-sm font-medium transition-all',
+              },
+              'Create one more invitation?'
+            )}
+            {React.createElement(
+              Link,
+              { href: '/', className: 'text-xs text-amber-600 hover:underline' },
+              'Back to Home'
+            )}
           </div>
         </div>
       </motion.div>
@@ -217,9 +222,9 @@ function SuccessContent() {
 }
 
 export default function SuccessPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SuccessContent />
-    </Suspense>
+  return React.createElement(
+    Suspense,
+    { fallback: React.createElement('div', null, 'Loading...') },
+    React.createElement(SuccessContent)
   )
 }

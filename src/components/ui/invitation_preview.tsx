@@ -1,6 +1,14 @@
 "use client"
 import { motion } from "framer-motion"
 
+type InvitationPreviewData = {
+  groom_name?: string
+  bride_name?: string
+  event1_date?: string
+  event1_time?: string
+  event1_location?: string
+}
+
 const formatTime = (timeStr: string) => {
   if (!timeStr) return ''
   const [hours, minutes] = timeStr.split(':')
@@ -10,7 +18,7 @@ const formatTime = (timeStr: string) => {
   return `${h12}:${minutes} ${ampm}`
 }
 
-export default function InvitationPreview({ data }: any) {
+export default function InvitationPreview({ data }: { data: InvitationPreviewData }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40, scale: 0.95 }}

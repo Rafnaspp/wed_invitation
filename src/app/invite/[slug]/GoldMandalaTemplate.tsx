@@ -8,6 +8,19 @@ const INSIDE_IMG = '/templates/gold-inside.png'
 
 const GoldMandalaTemplate: React.FC<TemplateProps> = ({ invitation, timeLeft, currentTheme, formatDate, formatTime }) => {
   const [opened, setOpened] = useState(false)
+  const isBrideSide = invitation.side === 'bride'
+  const firstPersonName = isBrideSide ? invitation.bride_name : invitation.groom_name
+  const secondPersonName = isBrideSide ? invitation.groom_name : invitation.bride_name
+  const firstPersonLabel = isBrideSide ? 'Bride' : 'Groom'
+  const secondPersonLabel = isBrideSide ? 'Groom' : 'Bride'
+  const firstPersonParentPrefix = isBrideSide ? 'D/O' : 'S/O'
+  const secondPersonParentPrefix = isBrideSide ? 'S/O' : 'D/O'
+  const firstPersonFather = isBrideSide ? invitation.bride_father : invitation.groom_father
+  const firstPersonMother = isBrideSide ? invitation.bride_mother : invitation.groom_mother
+  const secondPersonFather = isBrideSide ? invitation.groom_father : invitation.bride_father
+  const secondPersonMother = isBrideSide ? invitation.groom_mother : invitation.bride_mother
+  const firstPersonAddress = isBrideSide ? invitation.bride_address : invitation.groom_address
+  const secondPersonAddress = isBrideSide ? invitation.groom_address : invitation.bride_address
 
   const heroDateFormatted = useMemo(
     () => formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' }),
@@ -297,7 +310,7 @@ const GoldMandalaTemplate: React.FC<TemplateProps> = ({ invitation, timeLeft, cu
             <div className="content">
               <div className="topline">{currentTheme.header}</div>
               <div className="names">
-                {invitation.groom_name} <span className="amp">&</span> {invitation.bride_name}
+                {firstPersonName} <span className="amp">&</span> {secondPersonName}
               </div>
               <div className="date">{heroDateFormatted}</div>
               <div className="divider" />
@@ -307,24 +320,24 @@ const GoldMandalaTemplate: React.FC<TemplateProps> = ({ invitation, timeLeft, cu
 
               <div className="grid2" style={{ marginTop: 18 }}>
                 <div className="box">
-                  <div className="label">Groom</div>
+                  <div className="label">{firstPersonLabel}</div>
                   <div className="value">
-                    <div style={{ fontFamily: 'Cinzel, serif', letterSpacing: '0.08em' }}>{invitation.groom_name}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', letterSpacing: '0.08em' }}>{firstPersonName}</div>
                     <div style={{ opacity: 0.95, marginTop: 6 }}>
-                      S/O {invitation.groom_father} {invitation.groom_mother ? `& ${invitation.groom_mother}` : ''}
+                      {firstPersonParentPrefix} {firstPersonFather} {firstPersonMother ? `& ${firstPersonMother}` : ''}
                     </div>
-                    {invitation.groom_address ? <div style={{ marginTop: 8, opacity: 0.88 }}>{invitation.groom_address}</div> : null}
+                    {firstPersonAddress ? <div style={{ marginTop: 8, opacity: 0.88 }}>{firstPersonAddress}</div> : null}
                   </div>
                 </div>
 
                 <div className="box">
-                  <div className="label">Bride</div>
+                  <div className="label">{secondPersonLabel}</div>
                   <div className="value">
-                    <div style={{ fontFamily: 'Cinzel, serif', letterSpacing: '0.08em' }}>{invitation.bride_name}</div>
+                    <div style={{ fontFamily: 'Cinzel, serif', letterSpacing: '0.08em' }}>{secondPersonName}</div>
                     <div style={{ opacity: 0.95, marginTop: 6 }}>
-                      D/O {invitation.bride_father} {invitation.bride_mother ? `& ${invitation.bride_mother}` : ''}
+                      {secondPersonParentPrefix} {secondPersonFather} {secondPersonMother ? `& ${secondPersonMother}` : ''}
                     </div>
-                    {invitation.bride_address ? <div style={{ marginTop: 8, opacity: 0.88 }}>{invitation.bride_address}</div> : null}
+                    {secondPersonAddress ? <div style={{ marginTop: 8, opacity: 0.88 }}>{secondPersonAddress}</div> : null}
                   </div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 type InvitationPreviewData = {
   groom_name?: string
   bride_name?: string
+  side?: string
   event1_date?: string
   event1_time?: string
   event1_location?: string
@@ -19,6 +20,10 @@ const formatTime = (timeStr: string) => {
 }
 
 export default function InvitationPreview({ data }: { data: InvitationPreviewData }) {
+  const isBrideSide = data.side === 'bride'
+  const firstName = isBrideSide ? data.bride_name || "Jane" : data.groom_name || "John"
+  const secondName = isBrideSide ? data.groom_name || "John" : data.bride_name || "Jane"
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -31,7 +36,7 @@ export default function InvitationPreview({ data }: { data: InvitationPreviewDat
       </p>
 
       <h1 className="text-center text-2xl font-semibold text-[#6b3e26]">
-        {data.groom_name || "John"} & {data.bride_name || "Jane"}
+        {firstName} & {secondName}
       </h1>
 
       <p className="text-center text-xs text-[#6b3e26] mb-2">

@@ -26,6 +26,15 @@ const ClassicTemplate: React.FC<TemplateProps> = ({
   formatDate,
   formatTime
 }) => {
+  const isBrideSide = invitation.side === 'bride'
+  const firstPersonName = isBrideSide ? invitation.bride_name : invitation.groom_name
+  const secondPersonName = isBrideSide ? invitation.groom_name : invitation.bride_name
+  const firstPersonLabel = isBrideSide ? 'D/O' : 'S/O'
+  const secondPersonLabel = isBrideSide ? 'S/O' : 'D/O'
+  const firstPersonFather = isBrideSide ? invitation.bride_father : invitation.groom_father
+  const firstPersonMother = isBrideSide ? invitation.bride_mother : invitation.groom_mother
+  const secondPersonFather = isBrideSide ? invitation.groom_father : invitation.bride_father
+  const secondPersonMother = isBrideSide ? invitation.groom_mother : invitation.bride_mother
   const heroDateFormatted = formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' })
   const event1MonthFormatted = formatDate(invitation.event1_date, { month: 'long' }).toUpperCase()
   const event1DayFormatted = formatDate(invitation.event1_date, { day: 'numeric' })
@@ -55,7 +64,7 @@ const ClassicTemplate: React.FC<TemplateProps> = ({
         <div className="hero-glass-card">
           <p className="hero-sub-title">TOGETHER WITH THEIR FAMILIES</p>
           <h1 className="hero-names classic-serif">
-            {invitation.groom_name} <span className="ampersand">&</span> {invitation.bride_name}
+            {firstPersonName} <span className="ampersand">&</span> {secondPersonName}
           </h1>
           <p className="hero-date">{heroDateFormatted}</p>
         </div>
@@ -91,13 +100,13 @@ const ClassicTemplate: React.FC<TemplateProps> = ({
           <div ref={addRevealRef} className="scroll-reveal">
             <div className="couple-grid">
               <div className="text-center">
-                <h2 className="person-name classic-serif">{invitation.groom_name}</h2>
-                <p className="text-sm text-gray-600">S/O {invitation.groom_father} & {invitation.groom_mother}</p>
+                <h2 className="person-name classic-serif">{firstPersonName}</h2>
+                <p className="text-sm text-gray-600">{firstPersonLabel} {firstPersonFather} & {firstPersonMother}</p>
               </div>
               <div className="ampersand-big">&</div>
               <div className="text-center">
-                <h2 className="person-name classic-serif">{invitation.bride_name}</h2>
-                <p className="text-sm text-gray-600">D/O {invitation.bride_father} & {invitation.bride_mother}</p>
+                <h2 className="person-name classic-serif">{secondPersonName}</h2>
+                <p className="text-sm text-gray-600">{secondPersonLabel} {secondPersonFather} & {secondPersonMother}</p>
               </div>
             </div>
             <p className="insha-allah">{currentTheme.blessing}</p>

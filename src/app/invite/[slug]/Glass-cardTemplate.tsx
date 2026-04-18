@@ -12,6 +12,9 @@ const ModernMinimalistTemplate: React.FC<TemplateProps> = ({
   formatDate,
   formatTime
 }) => {
+  const isBrideSide = invitation.side === 'bride'
+  const firstPersonName = isBrideSide ? invitation.bride_name : invitation.groom_name
+  const secondPersonName = isBrideSide ? invitation.groom_name : invitation.bride_name
   const heroDateFormatted = formatDate(invitation.event1_date, { month: 'short', day: 'numeric', year: 'numeric' })
   const event1Day = formatDate(invitation.event1_date, { day: 'numeric' })
   const event1Weekday = formatDate(invitation.event1_date, { weekday: 'long' })
@@ -309,9 +312,9 @@ const ModernMinimalistTemplate: React.FC<TemplateProps> = ({
         <div className="mm-hero-card">
           <p className="mm-hero-eyebrow">Save the Date</p>
           <h1 className="mm-hero-names">
-            {invitation.groom_name}
+            {firstPersonName}
             <span className="mm-hero-amp">&</span>
-            {invitation.bride_name}
+            {secondPersonName}
           </h1>
           <div className="mm-hero-rule" />
           <p className="mm-hero-date">{heroDateFormatted}</p>

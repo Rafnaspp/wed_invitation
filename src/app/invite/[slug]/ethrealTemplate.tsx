@@ -20,6 +20,15 @@ function EtherealTemplate({
   formatDate,
   formatTime
 }: TemplateProps) {
+  const isBrideSide = invitation.side === 'bride'
+  const firstPersonName = isBrideSide ? invitation.bride_name : invitation.groom_name
+  const secondPersonName = isBrideSide ? invitation.groom_name : invitation.bride_name
+  const firstParentLabel = isBrideSide ? 'Parents of the bride' : 'Parents of the groom'
+  const secondParentLabel = isBrideSide ? 'Parents of the groom' : 'Parents of the bride'
+  const firstParentFather = isBrideSide ? invitation.bride_father : invitation.groom_father
+  const firstParentMother = isBrideSide ? invitation.bride_mother : invitation.groom_mother
+  const secondParentFather = isBrideSide ? invitation.groom_father : invitation.bride_father
+  const secondParentMother = isBrideSide ? invitation.groom_mother : invitation.bride_mother
   const heroDate = formatDate(invitation.event1_date, { month: 'long', day: 'numeric', year: 'numeric' })
   const eventDay = formatDate(invitation.event1_date, { day: '2-digit' })
   const eventMonth = formatDate(invitation.event1_date, { month: 'short' }).toUpperCase()
@@ -357,9 +366,9 @@ function EtherealTemplate({
                 Beginning our forever
               </span>
               <h1 className="eth-hero-names">
-                <span className="eth-hero-name">{invitation.groom_name}</span>
+                <span className="eth-hero-name">{firstPersonName}</span>
                 <span className="eth-hero-and">&</span>
-                <span className="eth-hero-name">{invitation.bride_name}</span>
+                <span className="eth-hero-name">{secondPersonName}</span>
               </h1>
               <div className="eth-date-bar">
                 <div className="eth-date-bar-line" />
@@ -400,22 +409,22 @@ function EtherealTemplate({
             The wedding of
           </p>
           <p className="eth-intro-names">
-            {invitation.groom_name}
+            {firstPersonName}
             <span style={{ display: 'block', margin: '0.4rem 0', textAlign: 'center' }}>&</span>
-            {invitation.bride_name}
+            {secondPersonName}
           </p>
 
           <div className="eth-parents-grid">
             <div className="eth-parent-groom">
-              <p className="eth-label" style={{ color: '#BF9B30' }}>Parents of the groom</p>
+              <p className="eth-label" style={{ color: '#BF9B30' }}>{firstParentLabel}</p>
               <p className="eth-parent-name">
-                {invitation.groom_father}<br />& {invitation.groom_mother}
+                {firstParentFather}<br />& {firstParentMother}
               </p>
             </div>
             <div className="eth-parent-bride">
-              <p className="eth-label" style={{ color: '#BF9B30' }}>Parents of the bride</p>
+              <p className="eth-label" style={{ color: '#BF9B30' }}>{secondParentLabel}</p>
               <p className="eth-parent-name">
-                {invitation.bride_father}<br />& {invitation.bride_mother}
+                {secondParentFather}<br />& {secondParentMother}
               </p>
             </div>
           </div>
